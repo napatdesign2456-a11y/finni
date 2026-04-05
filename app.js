@@ -1,76 +1,18 @@
-// 🔥 ใส่ Firebase Config ของคุณ
-const firebaseConfig = {
-  apiKey: "YOUR_KEY",
-  authDomain: "YOUR_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-};
+// 📦 โหลดข้อมูลจาก LocalStorage
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let isPro = localStorage.getItem("pro") === "true";
 
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-let user = null;
-let transactions = [];
-let isPro = false;
-
-// 🔐 REGISTER
-function register() {
-  auth.createUserWithEmailAndPassword(
-    email.value,
-    password.value
-  )
-  .then(() => alert("สมัครสำเร็จ"))
-  .catch(err => alert(err.message));
-}
-
-// 🔐 LOGIN
-function login() {
-  auth.signInWithEmailAndPassword(
-    email.value,
-    password.value
-  )
-  .then(() => alert("เข้าสู่ระบบแล้ว"))
-  .catch(err => alert(err.message));
-}
-
-// 🔓 LOGOUT
-function logout() {
-  auth.signOut();
-}
-
-// 👀 CHECK LOGIN
-auth.onAuthStateChanged(async (u) => {
-  if (u) {
-    user = u;
-    loginBox.style.display = "none";
-    mainApp.style.display = "block";
-    await loadData();
-  } else {
-    loginBox.style.display = "block";
-    mainApp.style.display = "none";
-  }
-});
-
-// 📦 LOAD DATA
-async function loadData() {
-  const doc = await db.collection("users").doc(user.uid).get();
-
-  if (doc.exists) {
-    const data = doc.data();
-    transactions = data.transactions || [];
-    isPro = data.pro || false;
-  }
-
-  updateUI();
-}
+// 📌 อ้างอิง DOM (สำคัญมาก)
+const transactionList = document.getElementById("transactionList");
+const income = document.getElementById("income");
+const expense = document.getElementById("expense");
+const profit = document.getElementById("profit");
+const balance = document.getElementById("balance");
 
 // 💾 SAVE DATA
 function saveData() {
-  db.collection("users").doc(user.uid).set({
-    transactions,
-    pro: isPro
-  });
+  localStorage.setItem("transactions", JSON.stringify(transactions));
+  localStorage.setItem("pro", isPro);
 }
 
 // ➕ ADD INCOME
@@ -111,22 +53,20 @@ function checkLimit() {
   return true;
 }
 
-// 💰 SHOW PAYMENT OPTIONS
+// 💰 PAYMENT OPTIONS (PromptPay)
 function showPaymentOptions() {
   const choice = confirm(
     "เลือกแพ็กเกจ:\n\nOK = รายเดือน (50 บาท)\nCancel = รายปี (500 บาท)"
   );
 
   if (choice) {
-    // รายเดือน
     window.open("https://promptpay.io/0803594656/50", "_blank");
   } else {
-    // รายปี
     window.open("https://promptpay.io/0803594656/500", "_blank");
   }
 }
 
-// 💳 MANUAL CONFIRM PAYMENT
+// 💳 CONFIRM PAYMENT
 function confirmPayment() {
   const confirmPay = confirm("คุณชำระเงินแล้วใช่ไหม?");
 
@@ -139,35 +79,27 @@ function confirmPayment() {
 
 // 📊 UPDATE UI
 function updateUI() {
-  let income = 0;
-  let expense = 0;
+  let totalIncome = 0;
+  let totalExpense = 0;
 
   transactionList.innerHTML = "";
 
-  transactions.forEach((t, index) => {
+  transactions.forEach((t) => {
     const li = document.createElement("li");
     li.innerText = `${t.name} - ฿${t.amount}`;
     transactionList.appendChild(li);
 
-    if (t.type === "income") income += t.amount;
-    else expense += t.amount;
+    if (t.type === "income") totalIncome += t.amount;
+    else totalExpense += t.amount;
   });
 
-  incomeText(income);
-  expenseText(expense);
-  profitText(income - expense);
+  income.innerText = "฿" + totalIncome;
+  expense.innerText = "฿" + totalExpense;
+
+  const total = totalIncome - totalExpense;
+  profit.innerText = "฿" + total;
+  balance.innerText = "฿" + total;
 }
 
-// 🧾 UI HELPERS
-function incomeText(val) {
-  income.innerText = "฿" + val;
-}
-
-function expenseText(val) {
-  expense.innerText = "฿" + val;
-}
-
-function profitText(val) {
-  profit.innerText = "฿" + val;
-  balance.innerText = "฿" + val;
-}
+// 🚀 START APP
+updateUI();
