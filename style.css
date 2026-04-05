@@ -1,0 +1,64 @@
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #ffffff;
+  color: white;
+}
+
+.app {
+  max-width: 400px;
+  margin: auto;
+  padding: 20px;
+}
+
+.login-box, .pro-box {
+  background: #022333;
+  padding: 15px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  border-radius: 8px;
+  border: none;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 5px;
+  background: #8feaff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+}
+
+.balance {
+  background: white;
+  color: black;
+  padding: 20px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  background: white;
+  color: black;
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+}
